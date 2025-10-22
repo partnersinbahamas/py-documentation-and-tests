@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_spectacular",
     "debug_toolbar",
     "cinema",
     "user",
@@ -113,6 +114,23 @@ AUTH_PASSWORD_VALIDATORS = [
         "NumericPasswordValidator",
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Movie API',
+    'DESCRIPTION': 'Application for managing movies and their sessions.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True, # False
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'defaultModelRendering': True,
+        'defaultModelsExpandDepth': 2,
+        'defaultModelExpandDepth': 2
+    }
+}
 
 AUTH_USER_MODEL = "user.User"
 
