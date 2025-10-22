@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -38,7 +40,6 @@ class GenreViewSet(
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-
 class ActorViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -48,6 +49,36 @@ class ActorViewSet(
     serializer_class = ActorSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    @extend_schema(
+        methods=["GET"],
+        tags=["actors"],
+        summary="Actors list",
+        description=(
+            "Returns all existing actors list."
+            "Request is allowed only for authenticated users."
+            "Otherwise, returns 401 status code."
+        ),
+        request=None,
+        responses={
+            200: ActorSerializer(many=True),
+            201: ActorSerializer(),
+            401: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Not unauthorized",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Authentication credentials were not provided."},
+                        name='Not unauthorized',
+                        response_only=True,
+                    )
+                ],
+            ),
+            # do response example for throttling (status 429)
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class CinemaHallViewSet(
