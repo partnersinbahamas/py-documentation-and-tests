@@ -2,14 +2,13 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiExample
 from rest_framework import viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -37,9 +36,55 @@ class GenreViewSet(
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+@extend_schema_view(
+    create=extend_schema(
+        summary="Actor create",
+        tags=["actors"],
+        methods=["POST"],
+        request=ActorSerializer,
+        examples=[OpenApiExample(
+            value={
+                "first_name": "Harry",
+                "last_name": "Potter",
+            },
+            name="Harry Potter",
+            response_only=False,
+        )],
+        description="""
+        Actor creation view.
+        Returns details of created actor.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        responses={
+            201: ActorSerializer,
+            401: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Unauthorized",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Authentication credentials were not provided."},
+                        name='Unauthorized',
+                        response_only=True,
+                    )
+                ]
+            ),
+            429: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Request was throttled.",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
+                        name="Request was throttled.",
+                        response_only=True,
+                    ),
+                ]
+            )
+        }
+    )
+)
 class ActorViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -47,34 +92,59 @@ class ActorViewSet(
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @extend_schema(
         methods=["GET"],
         tags=["actors"],
         summary="Actors list",
-        description=(
-            "Returns all existing actors list."
-            "Request is allowed only for authenticated users."
-            "Otherwise, returns 401 status code."
-        ),
+        description="""
+        Returns all existing actors list.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
         request=None,
         responses={
-            200: ActorSerializer(many=True),
-            201: ActorSerializer(),
+            200: OpenApiResponse(
+                response=ActorSerializer,
+                description="List of actors",
+                examples=[
+                    OpenApiExample(
+                        value=[
+                            {
+                                "id": 1,
+                                "first_name": "Harry",
+                                "last_name": "Potter",
+                                "full_name": "Harry Potter",
+                            },
+                        ],
+                        name="List of actors",
+                        response_only=True,
+                    )
+                ]
+            ),
             401: OpenApiResponse(
                 response=OpenApiTypes.OBJECT,
-                description="Not unauthorized",
+                description="Unauthorized",
                 examples=[
                     OpenApiExample(
                         value={"detail": "Authentication credentials were not provided."},
-                        name='Not unauthorized',
+                        name='Unauthorized',
                         response_only=True,
                     )
                 ],
             ),
-            # do response example for throttling (status 429)
+            429: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Request was throttled.",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
+                        name="Request was throttled.",
+                        response_only=True,
+                    ),
+                ]
+            )
         },
     )
     def list(self, request, *args, **kwargs):
@@ -88,7 +158,6 @@ class CinemaHallViewSet(
 ):
     queryset = CinemaHall.objects.all()
     serializer_class = CinemaHallSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
@@ -100,7 +169,6 @@ class MovieViewSet(
 ):
     queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
@@ -171,7 +239,6 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = MovieSessionSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
@@ -214,7 +281,6 @@ class OrderViewSet(
     )
     serializer_class = OrderSerializer
     pagination_class = OrderPagination
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
