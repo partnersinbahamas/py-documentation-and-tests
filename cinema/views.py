@@ -151,6 +151,133 @@ class ActorViewSet(
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Cinema hall list",
+        methods=["GET"],
+        tags=["cinema_hall"],
+        description="""
+        Returns all existing cinema halls list.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        responses={
+            200: OpenApiResponse(
+                response=CinemaHallSerializer(many=True),
+                description="List of cinema halls",
+                examples=[
+                    OpenApiExample(
+                        value=[
+                            {
+                                "id": 1,
+                                "name": "Ricciotto Canudo",
+                                "rows": 25,
+                                "seats_in_row": 30,
+                                "capacity": 750
+                            },
+                        ],
+                        name="Ricciotto Canudo cinema hall.",
+                        response_only=True,
+                    )
+                ],
+            ),
+            401: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Unauthorized",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Authentication credentials were not provided."},
+                        name='Unauthorized',
+                        response_only=True,
+                    )
+                ],
+            ),
+            429: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Request was throttled.",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
+                        name="Request was throttled.",
+                        response_only=True,
+                    ),
+                ]
+            )
+        }
+    ),
+    create=extend_schema(
+        summary="Cinema hall create",
+        description="""
+        Returns all existing cinema halls list.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
+        """,
+        methods=["POST"],
+        tags=["cinema_hall"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "name": "Ricciotto Canudo",
+                    "rows": 7,
+                    "seats_in_row": 19,
+                    "capacity": 133
+                },
+                name="Ricciotto Canudo cinema hall.",
+            ),
+        ],
+        responses={
+            201: OpenApiResponse(
+                response=CinemaHallSerializer,
+                description="Returns created cinema hall.",
+                examples=[
+                    OpenApiExample(
+                        value={
+                            "id": 5,
+                            "name": "Ricciotto Canudo",
+                            "rows": 7,
+                            "seats_in_row": 19,
+                            "capacity": 133
+                        },
+                        name="Ricciotto Canudo cinema hall.",
+                    ),
+                ]
+            ),
+            401: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Unauthorized",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Authentication credentials were not provided."},
+                        name='Unauthorized',
+                        response_only=True,
+                    )
+                ],
+            ),
+            403: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Forbidden",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "You do not have permission to perform this action."},
+                        name='Forbidden',
+                        response_only=True,
+                    )
+                ]
+            ),
+            429: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="Request was throttled.",
+                examples=[
+                    OpenApiExample(
+                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
+                        name="Request was throttled.",
+                        response_only=True,
+                    ),
+                ]
+            ),
+        }
+    )
+)
 class CinemaHallViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
