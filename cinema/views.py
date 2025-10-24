@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiExample, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -201,6 +201,123 @@ class CinemaHallViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Movies list",
+        description="""
+        Returns all existing movies list, filtered by query params.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        methods=["GET"],
+        tags=["movies"],
+        parameters=[
+            OpenApiParameter(
+                name="title",
+                required=False,
+                type=OpenApiTypes.STR,
+                description="Filter movies by title.",
+                examples=[
+                    OpenApiExample(
+                        value="",
+                        name="None",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value="Inception",
+                        name="Inception",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value="The Departed",
+                        name="The Departed",
+                        request_only=True,
+                    ),
+                ]
+            ),
+            OpenApiParameter(
+                name="genres",
+                type={"type": "array", "items": {"type": "number"}},
+                required=False,
+                description="Filter movies by genres.",
+                examples=[
+                    OpenApiExample(
+                        value="",
+                        name="None",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value=[1],
+                        name="Crime",
+                        request_only=True
+                    ),
+                    OpenApiExample(
+                        value=[1, 3],
+                        name="Crime, Thriller",
+                        request_only=True,
+                    ),
+                ]
+            ),
+            OpenApiParameter(
+                name="actors",
+                type={"type": "array", "items": {"type": "number"}},
+                required=False,
+                description="Filter movies by actors.",
+                examples=[
+                    OpenApiExample(
+                        value="",
+                        name="None",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value=[1],
+                        name="Jack Nicholson",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value=[1, 1],
+                        name="Jack Nicholson, Leonardo DiCaprio",
+                        request_only=True,
+                    ),
+                ]
+            )
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=MovieListSerializer(many=True),
+                description="List of movies",
+                examples=[
+                    OpenApiExample(
+                        value=[
+                            {
+                                "id": 1,
+                                "title": "Inception",
+                                "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                                "duration": 148,
+                                "genres": [
+                                    "Action",
+                                    "Adventure",
+                                    "Sci-Fi"
+                                ],
+                                "actors": [
+                                    "Leonardo DiCaprio",
+                                    "Joseph Gordon-Levitt",
+                                    "Elliot Page"
+                                ],
+                                "image": None
+                            },
+                        ],
+                        name="List of movies",
+                        response_only=True,
+                    )
+                ]
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+
+    )
+)
 class MovieViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
