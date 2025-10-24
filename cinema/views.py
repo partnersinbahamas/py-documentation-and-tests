@@ -27,6 +27,8 @@ from cinema.serializers import (
     OrderListSerializer,
     MovieImageSerializer,
 )
+from cinema_service.utils.schema_responses import SCHEMA_API_RESPONSE_401, SCHEMA_API_RESPONSE_429, \
+    SCHEMA_API_RESPONSE_403
 
 
 class GenreViewSet(
@@ -55,33 +57,14 @@ class GenreViewSet(
         description="""
         Actor creation view.
         Returns details of created actor.
-        Request is allowed only for authenticated users.
-        Otherwise, returns 401 status code.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
         """,
         responses={
             201: ActorSerializer,
-            401: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Unauthorized",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Authentication credentials were not provided."},
-                        name='Unauthorized',
-                        response_only=True,
-                    )
-                ]
-            ),
-            429: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Request was throttled.",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
-                        name="Request was throttled.",
-                        response_only=True,
-                    ),
-                ]
-            )
+            401: SCHEMA_API_RESPONSE_401,
+            403: SCHEMA_API_RESPONSE_403,
+            429: SCHEMA_API_RESPONSE_429,
         }
     )
 )
@@ -123,28 +106,8 @@ class ActorViewSet(
                     )
                 ]
             ),
-            401: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Unauthorized",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Authentication credentials were not provided."},
-                        name='Unauthorized',
-                        response_only=True,
-                    )
-                ],
-            ),
-            429: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Request was throttled.",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
-                        name="Request was throttled.",
-                        response_only=True,
-                    ),
-                ]
-            )
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
         },
     )
     def list(self, request, *args, **kwargs):
@@ -181,28 +144,8 @@ class ActorViewSet(
                     )
                 ],
             ),
-            401: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Unauthorized",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Authentication credentials were not provided."},
-                        name='Unauthorized',
-                        response_only=True,
-                    )
-                ],
-            ),
-            429: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Request was throttled.",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
-                        name="Request was throttled.",
-                        response_only=True,
-                    ),
-                ]
-            )
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
         }
     ),
     create=extend_schema(
@@ -242,39 +185,9 @@ class ActorViewSet(
                     ),
                 ]
             ),
-            401: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Unauthorized",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Authentication credentials were not provided."},
-                        name='Unauthorized',
-                        response_only=True,
-                    )
-                ],
-            ),
-            403: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Forbidden",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "You do not have permission to perform this action."},
-                        name='Forbidden',
-                        response_only=True,
-                    )
-                ]
-            ),
-            429: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                description="Request was throttled.",
-                examples=[
-                    OpenApiExample(
-                        value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
-                        name="Request was throttled.",
-                        response_only=True,
-                    ),
-                ]
-            ),
+            401: SCHEMA_API_RESPONSE_401,
+            403: SCHEMA_API_RESPONSE_403,
+            429: SCHEMA_API_RESPONSE_429,
         }
     )
 )
