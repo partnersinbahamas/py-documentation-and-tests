@@ -125,10 +125,10 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '5/minute',
-    #     'user': '100/minute'
-    # }
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',
+        'user': '30/minute'
+    }
 }
 
 SPECTACULAR_SETTINGS = {
