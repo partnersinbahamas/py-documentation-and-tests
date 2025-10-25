@@ -13,6 +13,7 @@ from cinema.models import (
     Order,
 )
 
+
 @extend_schema_serializer(component_name="GenreSerializerResponse")
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -128,6 +129,7 @@ class MovieSessionListSerializer(MovieSessionSerializer):
             "tickets_available",
         )
 
+
 @extend_schema_serializer(component_name="TicketSerializerResponse")
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
@@ -157,7 +159,9 @@ class TicketSeatsSerializer(TicketSerializer):
         fields = ("row", "seat")
 
 
-@extend_schema_serializer(component_name="MovieSessionDetailSerializerResponse")
+@extend_schema_serializer(
+    component_name="MovieSessionDetailSerializerResponse"
+)
 class MovieSessionDetailSerializer(MovieSessionSerializer):
     movie = MovieListSerializer(many=False, read_only=True)
     cinema_hall = CinemaHallSerializer(many=False, read_only=True)

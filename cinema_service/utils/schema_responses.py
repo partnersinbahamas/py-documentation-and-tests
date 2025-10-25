@@ -8,7 +8,7 @@ SCHEMA_API_RESPONSE_401 = OpenApiResponse(
     examples=[
         OpenApiExample(
             value={"detail": "Authentication credentials were not provided."},
-            name='Unauthorized',
+            name="Unauthorized",
             response_only=True,
         )
     ],
@@ -20,7 +20,11 @@ SCHEMA_API_RESPONSE_429 = OpenApiResponse(
     description="Request was throttled",
     examples=[
         OpenApiExample(
-            value={"detail": "Request was throttled. Expected available in {seconds} seconds."},
+            value={
+                "detail": """
+                Request was throttled. Expected available in {seconds} seconds.
+                """
+            },
             name="Request was throttled.",
             response_only=True,
         ),
@@ -33,8 +37,12 @@ SCHEMA_API_RESPONSE_403 = OpenApiResponse(
     description="Forbidden",
     examples=[
         OpenApiExample(
-            value={"detail": "You do not have permission to perform this action."},
-            name='Forbidden',
+            value={
+                "detail": """
+                You do not have permission to perform this action.
+                """
+            },
+            name="Forbidden",
             response_only=True,
         )
     ]

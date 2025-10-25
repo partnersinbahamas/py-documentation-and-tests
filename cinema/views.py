@@ -2,7 +2,13 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiExample, OpenApiParameter
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiResponse,
+    OpenApiExample,
+    OpenApiParameter
+)
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -27,8 +33,11 @@ from cinema.serializers import (
     OrderListSerializer,
     MovieImageSerializer,
 )
-from cinema_service.utils.schema_responses import SCHEMA_API_RESPONSE_401, SCHEMA_API_RESPONSE_429, \
+from cinema_service.utils.schema_responses import (
+    SCHEMA_API_RESPONSE_401,
+    SCHEMA_API_RESPONSE_429,
     SCHEMA_API_RESPONSE_403
+)
 
 
 @extend_schema_view(
@@ -106,6 +115,7 @@ class GenreViewSet(
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
 
 @extend_schema_view(
     create=extend_schema(
@@ -294,7 +304,12 @@ class CinemaHallViewSet(
                 value={
                     "id": 1,
                     "title": "Inception",
-                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "description": """
+                    A thief who steals corporate secrets
+                    through the use of dream-sharing technology
+                    is given the inverse task of planting an idea
+                    into the mind of a C.E.O.
+                    """,
                     "duration": 148,
                     "genres": [
                         "Action",
@@ -408,7 +423,11 @@ class CinemaHallViewSet(
                 value={
                     "id": 1,
                     "title": "Inception",
-                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "description": """
+                    A thief who steals corporate secrets through the use
+                    of dream-sharing technology is given the inverse task
+                    of planting an idea into the mind of a C.E.O.
+                    """,
                     "duration": 148,
                     "genres": [
                         "Action",
@@ -460,7 +479,12 @@ class MovieViewSet(
             OpenApiExample(
                 value={
                     "title": "Inception",
-                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "description": """
+                    A thief who steals corporate secrets through the use of
+                    dream-sharing technology is given the
+                    inverse task of planting an idea into the
+                    mind of a C.E.O.
+                    """,
                     "duration": 148,
                     "genres": [1, 2, 3],
                     "actors": [1, 2, 3],
@@ -472,7 +496,11 @@ class MovieViewSet(
                 value={
                     "id": 1,
                     "title": "Inception",
-                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "description": """
+                    A thief who steals corporate secrets through the use of
+                    dream-sharing technology is given the inverse task of
+                    planting an idea into the mind of a C.E.O.
+                    """,
                     "duration": 148,
                     "genres": [
                         "Action",
@@ -561,7 +589,9 @@ class MovieViewSet(
             OpenApiExample(
                 value={
                     "id": 1,
-                    "image": "http://127.0.0.1:8000/media/uploads/movies/your-uploaded-file.jpg"
+                    "image": """
+                    http://127.0.0.1:8000/media/uploads/movies/your-uploaded-file.jpg
+                    """
                 },
                 name="Created image for movie",
                 response_only=True,
@@ -607,6 +637,7 @@ class MovieViewSet(
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -669,7 +700,7 @@ class MovieViewSet(
         ],
         examples=[
             OpenApiExample(
-                value=  {
+                value={
                     "id": 1,
                     "show_time": "2024-10-08T13:00:00",
                     "movie_title": "The Departed",
@@ -709,7 +740,11 @@ class MovieViewSet(
                     "movie": {
                         "id": 1,
                         "title": "The Departed",
-                        "description": "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irishgang in South Boston.",
+                        "description": """
+                        An undercover cop and a mole in the police attempt to
+                        identify each other while infiltrating an
+                        Irishgang in South Boston.
+                        """,
                         "duration": 151,
                         "genres": [
                             "Crime",
@@ -882,16 +917,16 @@ class OrderPagination(PageNumberPagination):
             ),
             OpenApiExample(
                 value={
-                        "id": 1,
-                        "tickets": [
-                            {
-                                "id": 1,
-                                "row": 1,
-                                "seat": 4,
-                                "movie_session": 2
-                            }
-                        ],
-                        "created_at": "2025-10-25T14:05:23.418131"
+                    "id": 1,
+                    "tickets": [
+                        {
+                            "id": 1,
+                            "row": 1,
+                            "seat": 4,
+                            "movie_session": 2
+                        }
+                    ],
+                    "created_at": "2025-10-25T14:05:23.418131"
                 },
                 name="Created order with tickets",
                 response_only=True,
@@ -921,7 +956,10 @@ class OrderPagination(PageNumberPagination):
                             "tickets": [
                                 {
                                     "non_field_errors": [
-                                        "The fields movie_session, row, seat must make a unique set."
+                                        """
+                                        The fields movie_session, row,
+                                        seat must make a unique set.
+                                        """
                                     ]
                                 }
                             ]
