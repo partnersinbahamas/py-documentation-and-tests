@@ -46,14 +46,26 @@ class GenreViewSet(
         tags=["actors"],
         methods=["POST"],
         request=ActorSerializer,
-        examples=[OpenApiExample(
-            value={
-                "first_name": "Harry",
-                "last_name": "Potter",
-            },
-            name="Harry Potter",
-            response_only=False,
-        )],
+        examples=[
+            OpenApiExample(
+                value={
+                    "first_name": "Harry",
+                    "last_name": "Potter",
+                },
+                name="Harry Potter",
+                request_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "first_name": "Harry",
+                    "last_name": "Potter",
+                    "full_name": "Harry Potter",
+                },
+                name="Harry Potter",
+                response_only=True,
+            )
+        ],
         description="""
         Actor creation view.
         Returns details of created actor.
@@ -61,7 +73,10 @@ class GenreViewSet(
         Otherwise, returns 403 status code.
         """,
         responses={
-            201: ActorSerializer,
+            201: OpenApiResponse(
+                response=ActorSerializer,
+                description="Returns created actor.",
+            ),
             401: SCHEMA_API_RESPONSE_401,
             403: SCHEMA_API_RESPONSE_403,
             429: SCHEMA_API_RESPONSE_429,
@@ -93,14 +108,12 @@ class ActorViewSet(
                 description="List of actors",
                 examples=[
                     OpenApiExample(
-                        value=[
-                            {
-                                "id": 1,
-                                "first_name": "Harry",
-                                "last_name": "Potter",
-                                "full_name": "Harry Potter",
-                            },
-                        ],
+                        value={
+                            "id": 1,
+                            "first_name": "Harry",
+                            "last_name": "Potter",
+                            "full_name": "Harry Potter",
+                        },
                         name="List of actors",
                         response_only=True,
                     )
@@ -124,25 +137,23 @@ class ActorViewSet(
         Request is allowed only for authenticated users.
         Otherwise, returns 401 status code.
         """,
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 5,
+                    "name": "Ricciotto Canudo",
+                    "rows": 7,
+                    "seats_in_row": 19,
+                    "capacity": 133,
+                },
+                response_only=True,
+                name="Ricciotto Canudo cinema hall.",
+            )
+        ],
         responses={
             200: OpenApiResponse(
-                response=CinemaHallSerializer(many=True),
-                description="List of cinema halls",
-                examples=[
-                    OpenApiExample(
-                        value=[
-                            {
-                                "id": 1,
-                                "name": "Ricciotto Canudo",
-                                "rows": 25,
-                                "seats_in_row": 30,
-                                "capacity": 750
-                            },
-                        ],
-                        name="Ricciotto Canudo cinema hall.",
-                        response_only=True,
-                    )
-                ],
+                response=CinemaHallSerializer,
+                description="Returns list of cinema halls",
             ),
             401: SCHEMA_API_RESPONSE_401,
             429: SCHEMA_API_RESPONSE_429,
@@ -157,33 +168,33 @@ class ActorViewSet(
         """,
         methods=["POST"],
         tags=["cinema_hall"],
+        request=CinemaHallSerializer,
         examples=[
             OpenApiExample(
                 value={
                     "name": "Ricciotto Canudo",
                     "rows": 7,
                     "seats_in_row": 19,
-                    "capacity": 133
                 },
+                request_only=True,
                 name="Ricciotto Canudo cinema hall.",
             ),
+            OpenApiExample(
+                value={
+                    "id": 5,
+                    "name": "Ricciotto Canudo",
+                    "rows": 7,
+                    "seats_in_row": 19,
+                    "capacity": 133,
+                },
+                response_only=True,
+                name="Ricciotto Canudo cinema hall.",
+            )
         ],
         responses={
             201: OpenApiResponse(
                 response=CinemaHallSerializer,
                 description="Returns created cinema hall.",
-                examples=[
-                    OpenApiExample(
-                        value={
-                            "id": 5,
-                            "name": "Ricciotto Canudo",
-                            "rows": 7,
-                            "seats_in_row": 19,
-                            "capacity": 133
-                        },
-                        name="Ricciotto Canudo cinema hall.",
-                    ),
-                ]
             ),
             401: SCHEMA_API_RESPONSE_401,
             403: SCHEMA_API_RESPONSE_403,
@@ -211,6 +222,29 @@ class CinemaHallViewSet(
         """,
         methods=["GET"],
         tags=["movies"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "title": "Inception",
+                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "duration": 148,
+                    "genres": [
+                        "Action",
+                        "Adventure",
+                        "Sci-Fi"
+                    ],
+                    "actors": [
+                        "Leonardo DiCaprio",
+                        "Joseph Gordon-Levitt",
+                        "Elliot Page"
+                    ],
+                    "image": None
+                },
+                name="List of movies",
+                response_only=True,
+            )
+        ],
         parameters=[
             OpenApiParameter(
                 name="title",
@@ -284,33 +318,8 @@ class CinemaHallViewSet(
         ],
         responses={
             200: OpenApiResponse(
-                response=MovieListSerializer(many=True),
-                description="List of movies",
-                examples=[
-                    OpenApiExample(
-                        value=[
-                            {
-                                "id": 1,
-                                "title": "Inception",
-                                "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-                                "duration": 148,
-                                "genres": [
-                                    "Action",
-                                    "Adventure",
-                                    "Sci-Fi"
-                                ],
-                                "actors": [
-                                    "Leonardo DiCaprio",
-                                    "Joseph Gordon-Levitt",
-                                    "Elliot Page"
-                                ],
-                                "image": None
-                            },
-                        ],
-                        name="List of movies",
-                        response_only=True,
-                    )
-                ]
+                response=MovieListSerializer,
+                description="Returns list of movies",
             ),
             401: SCHEMA_API_RESPONSE_401,
             429: SCHEMA_API_RESPONSE_429,
