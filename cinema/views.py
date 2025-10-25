@@ -675,7 +675,7 @@ class MovieViewSet(
                 ]
             ),
             OpenApiParameter(
-                type=OpenApiTypes.STR,
+                type=OpenApiTypes.INT,
                 name="movie",
                 required=False,
                 description="Filter movie sessions by movie id.",
@@ -793,7 +793,6 @@ class MovieViewSet(
             429: SCHEMA_API_RESPONSE_429,
         }
     ),
-    # TODO: document also api actions such as: create, update, partial_update
 )
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (

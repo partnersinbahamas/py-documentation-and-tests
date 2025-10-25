@@ -13,6 +13,7 @@ from cinema.models import Movie, MovieSession, CinemaHall, Genre, Actor
 from cinema.serializers import MovieDetailSerializer, MovieListSerializer
 
 MOVIE_URL = reverse("cinema:movie-list")
+MOVIE_RETRIEVE_URL = reverse("cinema:movie-detail", args=[1])
 MOVIE_SESSION_URL = reverse("cinema:moviesession-list")
 
 
@@ -164,8 +165,18 @@ class UnauthenticatedMovieApi(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_auth_required(self):
+    def test_list_auth_required(self):
         res = self.client.get(MOVIE_URL)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_retrieve_auth_required(self):
+        sample_movie()
+        res = self.client.get(MOVIE_RETRIEVE_URL)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_create_auth_required(self):
+        sample_movie()
+        res = self.client.get(MOVIE_URL, data={})
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
