@@ -653,6 +653,144 @@ class OrderPagination(PageNumberPagination):
     max_page_size = 100
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Order list",
+        description="""
+        Returns paginated orders list for authenticated user.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        request=None,
+        methods=["GET"],
+        tags=["orders"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "tickets": [
+                        {
+                            "id": 1,
+                            "row": 1,
+                            "seat": 1,
+                            "movie_session": {
+                                "id": 1,
+                                "show_time": "2024-10-08T13:00:00",
+                                "movie_title": "The Departed",
+                                "movie_image": None,
+                                "cinema_hall_name": "Ricciotto Canudo",
+                                "cinema_hall_capacity": 750
+                            }
+                        },
+                    ],
+                    "created_at": "2022-08-09T09:06:18.876000"
+                },
+                name="Paginated list of orders",
+                response_only=True,
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=OrderListSerializer,
+                description="Returns paginated list of orders.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    ),
+    create=extend_schema(
+        summary="Order create",
+        tags=["orders"],
+        methods=["POST"],
+        description="""
+        Returns created order.
+        row, seat and movie_session should be unique.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
+        """,
+        examples=[
+            OpenApiExample(
+                value={
+                    "tickets": []
+                },
+                name="Create order without tickets",
+                request_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "tickets": [
+                        {
+                            "row": 1,
+                            "seat": 4,
+                            "movie_session": 2
+                        }
+                    ]
+                },
+                name="Create order with tickets",
+                request_only=True,
+            ),
+            OpenApiExample(
+                value={
+                        "id": 1,
+                        "tickets": [
+                            {
+                                "id": 1,
+                                "row": 1,
+                                "seat": 4,
+                                "movie_session": 2
+                            }
+                        ],
+                        "created_at": "2025-10-25T14:05:23.418131"
+                },
+                name="Created order with tickets",
+                response_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "id": 2,
+                    "tickets": [],
+                    "created_at": "2025-10-25T14:05:23.418131"
+                },
+                name="Created order without tickets",
+                response_only=True,
+            )
+        ],
+        responses={
+            201: OpenApiResponse(
+                response=OrderSerializer,
+                description="Returns created order.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            403: SCHEMA_API_RESPONSE_403,
+            400: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        value={
+                            "tickets": [
+                                {
+                                    "non_field_errors": [
+                                        "The fields movie_session, row, seat must make a unique set."
+                                    ]
+                                }
+                            ]
+                        },
+                        name="Tickets data validation error.",
+                        response_only=True,
+                    ),
+                    OpenApiExample(
+                        value={
+                            "detail": "Bad request."
+                        },
+                        name="Bad request.",
+                        response_only=True,
+                    ),
+                ],
+            ),
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    )
+)
 class OrderViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
