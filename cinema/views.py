@@ -608,7 +608,158 @@ class MovieViewSet(
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@extend_schema_view(
+    list=extend_schema(
+        summary="Movie session list",
+        tags=["movie_session"],
+        methods=["GET"],
+        request=None,
+        description="""
+        Returns movie session list.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        parameters=[
+            OpenApiParameter(
+                type=OpenApiTypes.DATE,
+                name="date",
+                required=False,
+                description="Filter movie sessions by date.",
+                examples=[
+                    OpenApiExample(
+                        value="",
+                        name="None",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value="2024-10-08",
+                        name="2024-10-08",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value="2024-10-09",
+                        name="2024-10-09",
+                        request_only=True,
+                    ),
+                ]
+            ),
+            OpenApiParameter(
+                type=OpenApiTypes.STR,
+                name="movie",
+                required=False,
+                description="Filter movie sessions by movie id.",
+                examples=[
+                    OpenApiExample(
+                        value="",
+                        name="None",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value=1,
+                        name="The Departed movie id",
+                        request_only=True,
+                    ),
+                    OpenApiExample(
+                        value=2,
+                        name="Inception movie id",
+                        request_only=True,
+                    )
+                ]
+            )
+        ],
+        examples=[
+            OpenApiExample(
+                value=  {
+                    "id": 1,
+                    "show_time": "2024-10-08T13:00:00",
+                    "movie_title": "The Departed",
+                    "movie_image": None,
+                    "cinema_hall_name": "Ricciotto Canudo",
+                    "cinema_hall_capacity": 750,
+                    "tickets_available": 747
+                },
+                response_only=True,
+                name="List of movie sessions",
+            )
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=MovieSessionListSerializer,
+                description="Returns movie session list.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    ),
+    retrieve=extend_schema(
+        summary="Movie session detail",
+        description="""
+        Returns movie session details.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        tags=["movie_session"],
+        methods=["GET"],
+        request=None,
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "show_time": "2024-10-08T13:00:00",
+                    "movie": {
+                        "id": 1,
+                        "title": "The Departed",
+                        "description": "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irishgang in South Boston.",
+                        "duration": 151,
+                        "genres": [
+                            "Crime",
+                            "Drama",
+                            "Thriller"
+                        ],
+                        "actors": [
+                            "Jack Nicholson",
+                            "Leonardo DiCaprio",
+                            "Matt Damon"
+                        ],
+                        "image": None
+                    },
+                    "cinema_hall": {
+                        "id": 1,
+                        "name": "Ricciotto Canudo",
+                        "rows": 25,
+                        "seats_in_row": 30,
+                        "capacity": 750
+                    },
+                    "taken_places": [
+                        {
+                            "row": 1,
+                            "seat": 1
+                        },
+                        {
+                            "row": 2,
+                            "seat": 3
+                        },
+                        {
+                            "row": 2,
+                            "seat": 4
+                        }
+                    ]
+                },
+                name="Movie session detail",
+                response_only=True,
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=MovieSessionDetailSerializer,
+                description="Returns movie session details.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    ),
+    # TODO: document also api actions such as: create, update, partial_update
+)
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = (
         MovieSession.objects.all()
