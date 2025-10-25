@@ -31,6 +31,73 @@ from cinema_service.utils.schema_responses import SCHEMA_API_RESPONSE_401, SCHEM
     SCHEMA_API_RESPONSE_403
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Genres list",
+        description="""
+        Returns genres list.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        request=None,
+        methods=["GET"],
+        tags=["genres"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "name": "Action"
+                },
+                name="Action genre",
+                response_only=True,
+            )
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=GenreSerializer,
+                description="Returns list of genres.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    ),
+    create=extend_schema(
+        summary="Genre create",
+        description="""
+        Returns created genre.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
+        """,
+        request=None,
+        methods=["POST"],
+        tags=["genres"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "name": "Action"
+                },
+                name="Created action genre",
+                response_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "name": "Action"
+                },
+                name="Action genre",
+                request_only=True,
+            )
+        ],
+        responses={
+            201: OpenApiResponse(
+                response=GenreSerializer,
+                description="Returns created genre.",
+            ),
+            403: SCHEMA_API_RESPONSE_403,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    ),
+)
 class GenreViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
