@@ -474,6 +474,56 @@ class MovieViewSet(
 
         return MovieSerializer
 
+    @extend_schema(
+        summary="Create image for movie",
+        description="""
+        Returns created image for movie.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
+        """,
+        tags=["movies"],
+        methods=["POST"],
+        examples=[
+            OpenApiExample(
+                value={
+                    "image": "https://your-uploaded-file.jpg"
+                },
+                name="Create image for movie",
+                request_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "image": "http://127.0.0.1:8000/media/uploads/movies/your-uploaded-file.jpg"
+                },
+                name="Created image for movie",
+                response_only=True,
+            )
+        ],
+        request=MovieImageSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=MovieImageSerializer,
+                description="Returns created image for movie.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            403: SCHEMA_API_RESPONSE_403,
+            404: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        value={
+                            "detail": "Bad request."
+                        },
+                        name="Bad request.",
+                        response_only=True,
+                    ),
+                ],
+                description="Bad request."
+            ),
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    )
     @action(
         methods=["POST"],
         detail=True,
