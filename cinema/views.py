@@ -325,6 +325,48 @@ class CinemaHallViewSet(
             429: SCHEMA_API_RESPONSE_429,
         }
 
+    ),
+    retrieve=extend_schema(
+        summary="Movie details",
+        request=None,
+        methods=["GET"],
+        tags=["movies"],
+        description="""
+        Returns a movie details.
+        Request is allowed only for authenticated users.
+        Otherwise, returns 401 status code.
+        """,
+        examples=[
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "title": "Inception",
+                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "duration": 148,
+                    "genres": [
+                        "Action",
+                        "Adventure",
+                        "Sci-Fi"
+                    ],
+                    "actors": [
+                        "Leonardo DiCaprio",
+                        "Joseph Gordon-Levitt",
+                        "Elliot Page"
+                    ],
+                    "image": None
+                },
+                name="Inception movie detail",
+                response_only=True,
+            )
+        ],
+        responses={
+            200: OpenApiResponse(
+                response=MovieDetailSerializer,
+                description="Returns movie details.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            429: SCHEMA_API_RESPONSE_429,
+        }
     )
 )
 class MovieViewSet(
@@ -336,6 +378,63 @@ class MovieViewSet(
     queryset = Movie.objects.prefetch_related("genres", "actors")
     serializer_class = MovieSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    @extend_schema(
+        summary="Movie create",
+        description="""
+        Returns created movie.
+        Request is allowed only for admin users.
+        Otherwise, returns 403 status code.
+        """,
+        methods=["POST"],
+        tags=["movies"],
+        request=MovieSerializer,
+        examples=[
+            OpenApiExample(
+                value={
+                    "title": "Inception",
+                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "duration": 148,
+                    "genres": [1, 2, 3],
+                    "actors": [1, 2, 3],
+                },
+                name="Create Inception movie",
+                request_only=True,
+            ),
+            OpenApiExample(
+                value={
+                    "id": 1,
+                    "title": "Inception",
+                    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    "duration": 148,
+                    "genres": [
+                        "Action",
+                        "Adventure",
+                        "Sci-Fi"
+                    ],
+                    "actors": [
+                        "Leonardo DiCaprio",
+                        "Joseph Gordon-Levitt",
+                        "Elliot Page"
+                    ],
+                    "image": None
+                },
+                name="Created Inception movie detail",
+                response_only=True,
+            )
+        ],
+        responses={
+            201: OpenApiResponse(
+                response=MovieDetailSerializer,
+                description="Returns created movie.",
+            ),
+            401: SCHEMA_API_RESPONSE_401,
+            403: SCHEMA_API_RESPONSE_403,
+            429: SCHEMA_API_RESPONSE_429,
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     @staticmethod
     def _params_to_ints(qs):
